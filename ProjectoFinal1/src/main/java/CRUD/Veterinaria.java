@@ -3,16 +3,29 @@ package CRUD;
 
 
 import Conexion.conexion;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import java.sql.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.TableModel;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.text.ParseException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 public class Veterinaria extends javax.swing.JFrame {
@@ -57,6 +70,11 @@ public class Veterinaria extends javax.swing.JFrame {
         Heredia = new javax.swing.JRadioButton();
         jLabel6 = new javax.swing.JLabel();
         date = new com.toedter.calendar.JDateChooser();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        txtdescuento = new javax.swing.JTextField();
+        txttotal = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         BTNagregar = new javax.swing.JButton();
         BTNmodificar = new javax.swing.JButton();
@@ -64,6 +82,7 @@ public class Veterinaria extends javax.swing.JFrame {
         BTNlimpiar = new javax.swing.JButton();
         btnReporte = new javax.swing.JButton();
         BTNsalir = new javax.swing.JButton();
+        BTNexcell = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         Table = new javax.swing.JTable();
@@ -115,83 +134,124 @@ public class Veterinaria extends javax.swing.JFrame {
 
         date.setDateFormatString("yyyy/MM/dd");
 
+        jLabel7.setText("Descuento");
+
+        jLabel8.setText("total");
+
+        txttotal.setEnabled(false);
+
+        jButton1.setText("Ventas");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(185, 185, 185)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtprecio, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(168, 168, 168)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(31, 31, 31)
-                                .addComponent(txtarticulo, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(27, 27, 27)
-                                .addComponent(txtcantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
                                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(38, 38, 38)
-                                .addComponent(date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(cboTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(242, 242, 242))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(500, 500, 500)
+                                .addGap(39, 39, 39)
+                                .addComponent(date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 400, Short.MAX_VALUE)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(143, 143, 143)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGap(33, 33, 33)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtdescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txttotal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(26, 26, 26)
+                                .addComponent(txtarticulo, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGap(149, 149, 149)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtprecio, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel4))
+                        .addGap(28, 28, 28)
+                        .addComponent(txtcantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(Alajuela, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(88, 88, 88)
-                        .addComponent(Heredia, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(119, 119, 119)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(Alajuela, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(88, 88, 88)
+                                .addComponent(Heredia, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(cboTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(329, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(410, 410, 410))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(50, 50, 50)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(cboTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(47, 47, 47)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(cboTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2)))
+                                .addGap(55, 55, 55)
+                                .addComponent(date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel1)
                                     .addComponent(txtarticulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel3)
-                                    .addComponent(txtprecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(36, 36, 36)
+                                .addComponent(jLabel6))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(74, 74, 74)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(txtdescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)
+                            .addComponent(txtprecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(Alajuela)
+                            .addComponent(Heredia)
                             .addComponent(jLabel4)
                             .addComponent(txtcantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel6)))
-                .addGap(12, 12, 12)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Alajuela)
-                    .addComponent(Heredia))
+                        .addGap(24, 24, 24)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(txttotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(78, Short.MAX_VALUE))
         );
 
@@ -199,6 +259,7 @@ public class Veterinaria extends javax.swing.JFrame {
         jPanel2.setForeground(new java.awt.Color(204, 204, 255));
 
         BTNagregar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BTNagregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/boton-mas.png"))); // NOI18N
         BTNagregar.setText("Agregar");
         BTNagregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -207,6 +268,7 @@ public class Veterinaria extends javax.swing.JFrame {
         });
 
         BTNmodificar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BTNmodificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/boton-editar.png"))); // NOI18N
         BTNmodificar.setText("Modificar");
         BTNmodificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -215,6 +277,7 @@ public class Veterinaria extends javax.swing.JFrame {
         });
 
         BTNeliminar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BTNeliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/eliminar.png"))); // NOI18N
         BTNeliminar.setText("Eliminar");
         BTNeliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -223,6 +286,7 @@ public class Veterinaria extends javax.swing.JFrame {
         });
 
         BTNlimpiar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BTNlimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/limpieza-de-datos.png"))); // NOI18N
         BTNlimpiar.setText("Limpiar");
         BTNlimpiar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,6 +302,7 @@ public class Veterinaria extends javax.swing.JFrame {
         });
 
         BTNsalir.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        BTNsalir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/salida-de-emergencia.png"))); // NOI18N
         BTNsalir.setText("Salir");
         BTNsalir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -245,44 +310,51 @@ public class Veterinaria extends javax.swing.JFrame {
             }
         });
 
+        BTNexcell.setText("Reporte Excell");
+        BTNexcell.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BTNexcellActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(232, Short.MAX_VALUE)
-                .addComponent(BTNagregar)
-                .addGap(58, 58, 58)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(156, 156, 156)
+                .addComponent(BTNagregar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34)
                 .addComponent(BTNmodificar)
-                .addGap(35, 35, 35)
+                .addGap(31, 31, 31)
                 .addComponent(BTNeliminar)
-                .addGap(18, 18, 18)
+                .addGap(53, 53, 53)
                 .addComponent(BTNlimpiar)
-                .addGap(155, 155, 155)
-                .addComponent(btnReporte)
-                .addGap(309, 309, 309))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(721, 721, 721)
-                    .addComponent(BTNsalir)
-                    .addContainerGap(432, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addComponent(BTNsalir)
+                .addGap(57, 57, 57)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(BTNexcell)
+                    .addComponent(btnReporte))
+                .addContainerGap(454, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(62, Short.MAX_VALUE)
+                .addContainerGap(24, Short.MAX_VALUE)
+                .addComponent(btnReporte)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(BTNexcell)
+                .addGap(26, 26, 26))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnReporte)
-                    .addComponent(BTNmodificar)
                     .addComponent(BTNagregar)
+                    .addComponent(BTNmodificar)
                     .addComponent(BTNeliminar)
-                    .addComponent(BTNlimpiar))
-                .addGap(34, 34, 34))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(61, 61, 61)
-                    .addComponent(BTNsalir)
-                    .addContainerGap(32, Short.MAX_VALUE)))
+                    .addComponent(BTNlimpiar)
+                    .addComponent(BTNsalir))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel3.setBackground(new java.awt.Color(204, 204, 255));
@@ -293,7 +365,7 @@ public class Veterinaria extends javax.swing.JFrame {
 
             },
             new String [] {
-                "id", "Articulo", "fecha", "precio", "cantidad", "sitio", "tipo"
+                "id", "Articulo", "fecha", "precio", "cantidad", "sitio", "tipo", "Descuento", "total"
             }
         ));
         Table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -335,7 +407,7 @@ public class Veterinaria extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 430, Short.MAX_VALUE))
         );
 
         pack();
@@ -350,27 +422,46 @@ public class Veterinaria extends javax.swing.JFrame {
         // TODO add your handling code here:
         Agregar();
         Consultar();
+        
+         ImagenesViewer viewer = new ImagenesViewer();
+        viewer.mostrarImagenes(this); // `this` es el JFrame actual
     }//GEN-LAST:event_BTNagregarActionPerformed
 
     private void BTNmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNmodificarActionPerformed
         // TODO add your handling code here:
 
         modificarRegistro();
+        
+        ImagenesViewer viewer = new ImagenesViewer();
+        viewer.mostrarImagenes(this); // `this` es el JFrame actual
     }//GEN-LAST:event_BTNmodificarActionPerformed
 
     private void BTNeliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNeliminarActionPerformed
         // TODO add your handling code here:
         eliminarRegistro();
+        
+        ImagenesViewer viewer = new ImagenesViewer();
+        viewer.mostrarImagenes(this); // `this` es el JFrame actual
     }//GEN-LAST:event_BTNeliminarActionPerformed
 
     private void BTNlimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNlimpiarActionPerformed
         // TODO add your handling code here:
         limpiarCampos();
+        
+        ImagenesViewer viewer = new ImagenesViewer();
+        viewer.mostrarImagenes(this); // `this` es el JFrame actual
     }//GEN-LAST:event_BTNlimpiarActionPerformed
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
-        // TODO add your handling code here:
+            // TODO add your handling code here:
+             conexion con = new conexion(); 
+    Connection conect = con.getConnection(); // Obtener la conexión de tu clase
 
+    // Llamar al método para generar el PDF
+    GeneratePdfReport.generatePdf(conect);
+
+    // Mostrar mensaje de éxito
+    JOptionPane.showMessageDialog(null, "PDF generado exitosamente en el escritorio.");
     }//GEN-LAST:event_btnReporteActionPerformed
 
     private void BTNsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNsalirActionPerformed
@@ -381,55 +472,91 @@ public class Veterinaria extends javax.swing.JFrame {
             System.exit(0); // Cierra la aplicación
         }
 
+        
+        ImagenesViewer viewer = new ImagenesViewer();
+        viewer.mostrarImagenes(this); // `this` es el JFrame actual
     }//GEN-LAST:event_BTNsalirActionPerformed
 
     private void TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TableMouseClicked
       
     int fila = Table.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(null, "Seleccione una fila ");
-    } else {
-        // Obtener los valores actuales de la tabla
-        int idc = Integer.parseInt(Table.getValueAt(fila, 0).toString());
-        String articulo = Table.getValueAt(fila, 1).toString(); // ARTICULO
-        String fecha = Table.getValueAt(fila, 2).toString();    // FECHA
-        String precio = Table.getValueAt(fila, 3).toString();    // PRECIO
-        String cantidad = Table.getValueAt(fila, 4).toString();  // CANTIDAD
-        String sitio = Table.getValueAt(fila, 5).toString();     // SITIO
-        String tipo = Table.getValueAt(fila, 6).toString();      // TIPO
+if (fila == -1) {
+    JOptionPane.showMessageDialog(null, "Seleccione una fila ");
+} else {
+    // Obtener los valores actuales de la tabla
+    int idc = Integer.parseInt(Table.getValueAt(fila, 0).toString());
+    String articulo = Table.getValueAt(fila, 1).toString(); // ARTICULO
+    String fecha = Table.getValueAt(fila, 2).toString();    // FECHA
+    String precio = Table.getValueAt(fila, 3).toString();    // PRECIO
+    String cantidad = Table.getValueAt(fila, 4).toString();  // CANTIDAD
+    String sitio = Table.getValueAt(fila, 5).toString();     // SITIO
+    String tipo = Table.getValueAt(fila, 6).toString();      // TIPO
+    String descuento = Table.getValueAt(fila, 7).toString(); // DESCUENTO
+    String total = Table.getValueAt(fila, 8).toString();     // TOTAL
+   
 
-        // Convertir el texto de la fecha a un objeto java.util.Date
-        java.util.Date fecha2 = null;
-        try {
-            if (fecha != null && !fecha.trim().isEmpty()) {
-                fecha2 = new SimpleDateFormat("yyyy-MM-dd").parse(fecha);
-                date.setDate(fecha2);
-            } else {
-                JOptionPane.showMessageDialog(null, "Fecha no válida o vacía.");
-            }
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(null, "Error en el formato de la fecha: " + e.getMessage());
-        }
-
-        // Asignar los valores a los campos de texto y otros componentes
-        txtarticulo.setText(articulo);
-        txtprecio.setText(precio);
-        txtcantidad.setText(cantidad);
-
-        if (sitio.equals("Alajuela")) {
-            Alajuela.setSelected(true);
-            Heredia.setSelected(false);
-        } else if (sitio.equals("Heredia")) {
-            Alajuela.setSelected(false);
-            Heredia.setSelected(true);
-        }
-
-        cboTipo.setSelectedItem(tipo);
-    }
-    }//GEN-LAST:event_TableMouseClicked
-    void Consultar() {
-    String sql = "SELECT * FROM notas";
+    // Convertir el texto de la fecha a un objeto java.util.Date
+    java.util.Date fecha2 = null;
     try {
+        if (fecha != null && !fecha.trim().isEmpty()) {
+            fecha2 = new SimpleDateFormat("yyyy-MM-dd").parse(fecha);
+            date.setDate(fecha2);
+        } else {
+            JOptionPane.showMessageDialog(null, "Fecha no válida o vacía.");
+        }
+    } catch (ParseException e) {
+        JOptionPane.showMessageDialog(null, "Error en el formato de la fecha: " + e.getMessage());
+    }
+
+    // Asignar los valores a los campos de texto y otros componentes
+    txtarticulo.setText(articulo);
+    txtprecio.setText(precio);
+    txtcantidad.setText(cantidad);
+    txtdescuento.setText(descuento);
+    
+
+    if (sitio.equals("Alajuela")) {
+        Alajuela.setSelected(true);
+        Heredia.setSelected(false);
+    } else if (sitio.equals("Heredia")) {
+        Alajuela.setSelected(false);
+        Heredia.setSelected(true);
+    }
+
+    cboTipo.setSelectedItem(tipo);
+}
+
+    }//GEN-LAST:event_TableMouseClicked
+
+    private void BTNexcellActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTNexcellActionPerformed
+        // TODO add your handling code here:\       
+   conexion con = new conexion(); 
+    Connection conect = con.getConnection(); // Obtener la conexión de tu clase
+
+   
+        // Llamar al método para generar el reporte Excel
+        GenerateExcelReport.generateExcel(conect);
+
+        // Mostrar mensaje de éxito
+        JOptionPane.showMessageDialog(null, "Reporte Excel generado exitosamente.");
+   
+    }//GEN-LAST:event_BTNexcellActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+        // Crear y mostrar la ventana de ventas
+        Ventas ventasFrame = new Ventas();
+        ventasFrame.setVisible(true);
+    
+    }//GEN-LAST:event_jButton1ActionPerformed
+ void Consultar() {
+    String sql = "SELECT * FROM veterinaria";
+    ResultSet rs = null;
+    Statement st = null;
+    
+    try {
+        // Verificar la conexión
         if (conect == null || conect.isClosed()) {
             conect = con.getConnection(); // Vuelve a conectar si la conexión está cerrada
         }
@@ -441,14 +568,17 @@ public class Veterinaria extends javax.swing.JFrame {
         model.setRowCount(0); // Limpiar todas las filas existentes
         
         while (rs.next()) {
-            Object[] dato = new Object[7];
+            Object[] dato = new Object[9];
             dato[0] = rs.getInt("id");
-            dato[1] = rs.getDate("articulo");
-            dato[2] = rs.getString("fecha");
+            dato[1] = rs.getString("articulo");
+            dato[2] = rs.getDate("fecha"); // Asegúrate de que el formato de fecha es el esperado
             dato[3] = rs.getString("precio");
             dato[4] = rs.getString("cantidad");
             dato[5] = rs.getString("sitio");
-            dato[6] = rs.getDouble("tipo");
+            dato[6] = rs.getString("tipo");
+            dato[7] = rs.getDouble("descuento");
+            dato[8] = rs.getDouble("total");
+            
             model.addRow(dato);
         }
         
@@ -462,12 +592,137 @@ public class Veterinaria extends javax.swing.JFrame {
             if (st != null) st.close();
             // No cerrar 'conect' aquí, puede necesitar ser reutilizado
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error al cerrar conexión: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al cerrar recursos: " + ex.getMessage());
         }
     }
 }
 
     
+     public class GenerateExcelReport {
+
+    public static void generateExcel(Connection connection) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Reporte Veterinaria");
+
+        // Crear una fila para los encabezados
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"ID", "Fecha", "Sitio", "Artículo", "Tipo", "Precio", "Cantidad", "Descuento", "Total"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+
+        // Obtener los datos de la base de datos
+        Statement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT id, fecha, sitio, articulo, tipo, precio, cantidad, descuento, total FROM veterinaria");
+
+            int rowNum = 1;
+            while (resultSet.next()) {
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(resultSet.getInt("id"));
+                row.createCell(1).setCellValue(resultSet.getString("fecha"));
+                row.createCell(2).setCellValue(resultSet.getString("sitio"));
+                row.createCell(3).setCellValue(resultSet.getString("articulo"));
+                row.createCell(4).setCellValue(resultSet.getString("tipo"));
+                row.createCell(5).setCellValue(resultSet.getDouble("precio"));
+                row.createCell(6).setCellValue(resultSet.getDouble("cantidad"));
+                row.createCell(7).setCellValue(resultSet.getDouble("descuento"));
+                row.createCell(8).setCellValue(resultSet.getDouble("total"));
+                
+            }
+
+            // Escribir el archivo Excel
+            try (FileOutputStream fileOut = new FileOutputStream("C:/Users/hoshu/OneDrive/Documents/Reporte_Veterinaria.xlsx")) {
+                workbook.write(fileOut);
+            }
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null && !connection.isClosed()) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+    
+     
+      
+     public class GeneratePdfReport {
+
+    public static void generatePdf(Connection connection) {
+        Document document = new Document();
+        Statement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String ruta = "C:/Users/hoshu/OneDrive/Documents/Reporte_Veterinaria.pdf";
+            PdfWriter.getInstance(document, new FileOutputStream(ruta));
+            document.open();
+
+            // Crear una tabla con 10 columnas
+            PdfPTable table = new PdfPTable(9);
+
+            // Agregar encabezados a la tabla
+            table.addCell("ID");
+            table.addCell("Fecha");
+            table.addCell("Sitio");
+            table.addCell("Artículo");
+            table.addCell("Tipo");
+            table.addCell("Precio");
+            table.addCell("Cantidad");
+            table.addCell("Descuento");
+            table.addCell("Total");
+       
+
+            // Crear un statement para obtener los datos de la tabla
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT id, fecha, sitio, articulo, tipo, precio, cantidad, descuento, total FROM veterinaria");
+
+            // Llenar la tabla con los datos obtenidos de la base de datos
+            while (resultSet.next()) {
+                table.addCell(resultSet.getString("id"));
+                table.addCell(resultSet.getString("fecha"));
+                table.addCell(resultSet.getString("sitio"));
+                table.addCell(resultSet.getString("articulo"));
+                table.addCell(resultSet.getString("tipo"));
+                table.addCell(resultSet.getString("precio"));
+                table.addCell(resultSet.getString("cantidad"));
+                table.addCell(resultSet.getString("descuento"));
+                table.addCell(resultSet.getString("total"));
+               
+            }
+
+            document.add(table);
+        } catch (DocumentException | IOException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            document.close();
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null && !connection.isClosed()) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
 void modificarRegistro() {
     int filaSeleccionada = Table.getSelectedRow();
     if (filaSeleccionada == -1) {
@@ -483,6 +738,8 @@ void modificarRegistro() {
     String cantidad = Table.getValueAt(filaSeleccionada, 4).toString(); // CANTIDAD
     String sitio = Table.getValueAt(filaSeleccionada, 5).toString(); // SITIO
     String tipo = Table.getValueAt(filaSeleccionada, 6).toString(); // TIPO
+    String descuento = Table.getValueAt(filaSeleccionada, 7).toString(); // DESCUENTO
+    String totalActual = Table.getValueAt(filaSeleccionada, 8).toString(); // TOTAL
 
     // Obtener los nuevos valores desde los campos de texto u otros componentes
     String nuevoArticulo = txtarticulo.getText();
@@ -490,33 +747,74 @@ void modificarRegistro() {
     String nuevoTipo = cboTipo.getSelectedItem().toString();
     String nuevoSitio = Alajuela.isSelected() ? "Alajuela" : "Heredia";
     String nuevaCantidad = txtcantidad.getText();
+    String nuevoDescuento = txtdescuento.getText();
 
+    Double nuevoPrecioDouble;
+    Double nuevaCantidadDouble;
+    Double nuevoDescuentoDouble;
+    Double impuestoVenta = 0.13; // 13% IVA
     try {
-        if (nuevoArticulo.isEmpty() || nuevoPrecio.isEmpty() || nuevoTipo.isEmpty() || nuevoSitio.isEmpty() || nuevaCantidad.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Revise los datos");
+        nuevoPrecioDouble = Double.parseDouble(nuevoPrecio);
+        nuevaCantidadDouble = Double.parseDouble(nuevaCantidad);
+        nuevoDescuentoDouble = Double.parseDouble(nuevoDescuento);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Los campos precio, cantidad y descuento deben ser números válidos.");
+        return;
+    }
+
+    // Calcular el total antes del descuento e IVA
+    double total = nuevoPrecioDouble * nuevaCantidadDouble;
+
+    // Aplicar descuento
+    double descuentoAplicado = total * (nuevoDescuentoDouble / 100);
+    double totalConDescuento = total - descuentoAplicado;
+
+    // Aplicar IVA
+    double ivaAplicado = totalConDescuento * impuestoVenta;
+    double precioFinal = totalConDescuento + ivaAplicado;
+
+    DecimalFormat df = new DecimalFormat("###.##");
+
+    // Establecer el precio final en el campo txttotal
+    txttotal.setText(df.format(precioFinal));
+
+    // Validar datos
+    if (nuevoArticulo.isEmpty() || nuevoPrecio.isEmpty() || nuevoTipo.isEmpty() || nuevoSitio.isEmpty() || nuevaCantidad.isEmpty() || nuevoDescuento.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Revise los datos");
+        return;
+    }
+
+    // Verificar si los nuevos datos son diferentes a los actuales
+    if (nuevoArticulo.equals(articulo) && nuevoPrecio.equals(precio) && nuevoTipo.equals(tipo) && nuevoSitio.equals(sitio) && nuevaCantidad.equals(cantidad) && nuevoDescuento.equals(descuento)) {
+        JOptionPane.showMessageDialog(null, "No se realizaron cambios.");
+        return;
+    }
+
+    // Usar PreparedStatement para evitar inyección SQL
+    String sql = "UPDATE veterinaria SET fecha=?, articulo=?, precio=?, cantidad=?, sitio=?, tipo=?, descuento=?, total=? WHERE id=?";
+    try (PreparedStatement pstmt = conect.prepareStatement(sql)) {
+        pstmt.setString(1, fecha);
+        pstmt.setString(2, nuevoArticulo);
+        pstmt.setDouble(3, nuevoPrecioDouble);
+        pstmt.setDouble(4, nuevaCantidadDouble);
+        pstmt.setString(5, nuevoSitio);
+        pstmt.setString(6, nuevoTipo);
+        pstmt.setDouble(7, nuevoDescuentoDouble);
+        pstmt.setDouble(8, precioFinal); // Usar precioFinal en lugar de total
+        pstmt.setString(9, id);
+
+        int resultado = pstmt.executeUpdate();
+
+        if (resultado > 0) {
+            JOptionPane.showMessageDialog(null, "Registro actualizado con éxito");
+
+            // Limpiar campos de texto
+            limpiarCampos();
+
+            // Actualizar y limpiar tabla
+            Consultar(); // Asegúrate de que este método actualice correctamente la tabla
         } else {
-            // Verificar si los nuevos datos son diferentes a los actuales
-            if (nuevoArticulo.equals(articulo) && nuevoPrecio.equals(precio) && nuevoTipo.equals(tipo) && nuevoSitio.equals(sitio) && nuevaCantidad.equals(cantidad)) {
-                JOptionPane.showMessageDialog(null, "No se realizaron cambios.");
-                return;
-            }
-
-            String sql = "UPDATE veterinaria SET fecha='" + fecha + "', articulo='" + nuevoArticulo + "', precio=" + nuevoPrecio + ", cantidad=" + nuevaCantidad + ", sitio='" + nuevoSitio + "', tipo='" + nuevoTipo + "' WHERE id=" + id;
-            conect = con.getConnection();
-            st = conect.createStatement();
-            int resultado = st.executeUpdate(sql);
-
-            if (resultado > 0) {
-                JOptionPane.showMessageDialog(null, "Registro actualizado con éxito");
-
-                // Limpiar campos de texto
-                limpiarCampos();
-
-                // Actualizar y limpiar tabla
-                Consultar(); // Asegúrate de que este método actualice correctamente la tabla
-            } else {
-                JOptionPane.showMessageDialog(null, "No se encontró el registro para actualizar");
-            }
+            JOptionPane.showMessageDialog(null, "No se encontró el registro para actualizar");
         }
     } catch (Exception e) {
         JOptionPane.showMessageDialog(null, "Error al actualizar el registro: " + e.getMessage());
@@ -525,39 +823,96 @@ void modificarRegistro() {
 
 
 void limpiarCampos() {
-    
-    txtarticulo.setText("");  // Limpia el campo de nombre
-    txtprecio.setText("");  
-    txtcantidad.setText("");
-  
-    
+    txtarticulo.setText("");  // Limpia el campo de artículo
+    txtprecio.setText("");    // Limpia el campo de precio
+    txtcantidad.setText("");  // Limpia el campo de cantidad
+    txtdescuento.setText(""); // Limpia el campo de descuento
+    ((JTextField) date.getDateEditor().getUiComponent()).setText(""); // Limpia el campo de fecha
+    cboTipo.setSelectedIndex(0); // Resetea el combo box a la primera opción
+    buttonGroup1.clearSelection(); // Limpia la selección de los radio buttons
 }
 
-    
+
 void Agregar() {
-        String sitio = "";
-        if (Alajuela.isSelected()) {
-            sitio = Alajuela.getText();
-        } else if (Heredia.isSelected()) {
-            sitio = Heredia.getText();
+    // Obtener valores de los campos de texto y otros componentes
+    String articulo = txtarticulo.getText();
+    String tipo = cboTipo.getSelectedItem().toString();
+    String fecha = ((JTextField) date.getDateEditor().getUiComponent()).getText();
+    String sitio = Alajuela.isSelected() ? "Alajuela" : "Heredia";
+    
+    // Validar y obtener valores numéricos
+    Double precio, cantidad, descuento;
+    Double impuestoVenta = 0.13; // 13% IVA
+    
+    try {
+        precio = Double.parseDouble(txtprecio.getText());
+        cantidad = Double.parseDouble(txtcantidad.getText());
+        descuento = Double.parseDouble(txtdescuento.getText());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Los campos precio, cantidad y descuento deben ser números válidos.");
+        return;
+    }
+    
+    // Calcular el total antes del descuento e IVA
+    double total = precio * cantidad;
+    
+    // Aplicar descuento
+    double descuentoAplicado = total * (descuento / 100);
+    double totalConDescuento = total - descuentoAplicado;
+    
+    // Aplicar IVA
+    double ivaAplicado = totalConDescuento * impuestoVenta;
+    double totalConIva = totalConDescuento + ivaAplicado;
+
+    // Formatear el total
+    DecimalFormat df = new DecimalFormat("###.##");
+    String totalFormatted = df.format(totalConIva);
+    
+    // Establecer el precio final en el campo txttotal
+    txttotal.setText(totalFormatted);
+    
+    try {
+        // Validar que todos los campos necesarios estén llenos
+        if (articulo.isEmpty() || tipo.equals("Seleccione:") || fecha.isEmpty() || sitio.isEmpty() || txtprecio.getText().isEmpty() || txtcantidad.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Ingrese todos los datos");
+            return;
         }
 
-        String articulo = txtarticulo.getText();
-        String tipo = cboTipo.getSelectedItem().toString();
-        String fecha = ((JTextField) date.getDateEditor().getUiComponent()).getText();
-        Double precio = Double.parseDouble(txtprecio.getText());
-        Double cantidad = Double.parseDouble(txtcantidad.getText());
-        DecimalFormat df = new DecimalFormat("###.##");
+        // Preparar y ejecutar la consulta SQL
+        String sql = "INSERT INTO veterinaria (articulo, fecha, precio, cantidad, sitio, tipo, descuento, total) " +
+                     "VALUES ('" + articulo + "', '" + fecha + "', " + precio + ", " + cantidad + ", '" + sitio + "', '" + tipo + "', " + descuento + ", " + df.format(totalConIva) + ")";
+        
+        conect = con.getConnection();
+        st = conect.createStatement();
+        st.executeUpdate(sql);
+        
+        JOptionPane.showMessageDialog(null, "Datos ingresados");
+        
+        // Limpiar campos de texto
+        txtarticulo.setText("");
+        txtprecio.setText("");
+        txtcantidad.setText("");
+        txtdescuento.setText("");
+        txttotal.setText("");
+        cboTipo.setSelectedIndex(0);
+        Alajuela.setSelected(false);
+        Heredia.setSelected(false);
 
-        // Aquí puedes continuar con lo que necesites hacer con los datos
-        System.out.println("Sitio: " + sitio);
-        System.out.println("Artículo: " + articulo);
-        System.out.println("Tipo: " + tipo);
-        System.out.println("Fecha: " + fecha);
-        System.out.println("Precio: " + df.format(precio));
-        System.out.println("Cantidad: " + df.format(cantidad));
+        // Limpiar tabla (asumiendo que hay un método para hacerlo)
+        LimpiarTabla();
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
+
+
+
+
+void LimpiarTabla() {
+    // Implementa aquí la lógica para limpiar la tabla en tu interfaz de usuario si es necesario.
+}
     void eliminarRegistro() {
     int filaSeleccionada = Table.getSelectedRow();
     if (filaSeleccionada == -1) {
@@ -590,24 +945,19 @@ void Agregar() {
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
     } finally {
-        // Cerrar recursos en el bloque finally
+        // Cerrar recursos en el bloque finally, pero no cerrar la conexión
         try {
             if (st != null) st.close();
-            if (conect != null) conect.close();
+            // No cerrar la conexión aquí para que siga abierta
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error al cerrar conexión: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al cerrar Statement: " + ex.getMessage());
         }
     }
 }
 
+
      
-void LimpiarTabla() {
-        DefaultTableModel modelo = (DefaultTableModel) Table.getModel();
-        int rowCount = modelo.getRowCount();
-        for (int i = rowCount - 1; i >= 0; i--) {
-            modelo.removeRow(i);
-        }
-    }
+
 
 
 
@@ -648,6 +998,7 @@ void LimpiarTabla() {
     private javax.swing.JRadioButton Alajuela;
     private javax.swing.JButton BTNagregar;
     private javax.swing.JButton BTNeliminar;
+    private javax.swing.JButton BTNexcell;
     private javax.swing.JButton BTNlimpiar;
     private javax.swing.JButton BTNmodificar;
     private javax.swing.JButton BTNsalir;
@@ -659,12 +1010,15 @@ void LimpiarTabla() {
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JComboBox<String> cboTipo;
     private com.toedter.calendar.JDateChooser date;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -673,6 +1027,8 @@ void LimpiarTabla() {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtarticulo;
     private javax.swing.JTextField txtcantidad;
+    private javax.swing.JTextField txtdescuento;
     private javax.swing.JTextField txtprecio;
+    private javax.swing.JTextField txttotal;
     // End of variables declaration//GEN-END:variables
 }
